@@ -1,19 +1,29 @@
 package main
 
 import (
-    "net/http"
+    "log"
+	"net/http"
 
-    "github.com/go-chi/chi/v5"
-    "github.com/go-chi/chi/v5/middleware"
+	"BookStatBackend/internal/api"
+	"BookStatBackend/internal/db"
 )
 
 func main() {
-    r := chi.NewRouter()
-    r.Use(middleware.Logger)
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-        w.Write([]byte("Hello World!"))
-    })
+	// Connect to a db
+	database, err := db.Connect("./data/data.db")
+	if err != nil {
+		log.Fatal(err);
+	}
+	defer database.Close()
+
+	//Setup the schema if not already setup:
+	if err := db.InitSchema(database); err != nil {
+		log.Fatal(err)
+	}
+
+	r := api.NewApiRouter(database);
+  
     http.ListenAndServe(":3000", r)
 }
 
