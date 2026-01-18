@@ -20,8 +20,10 @@ The backend uses a lightweight SQLite database stored locally in data/data.db fi
 
 Navigate to the project root:
 
-`cd BookStatBackend/
-go run cmd/main.go`
+```
+cd BookStatBackend/
+go run cmd/main.go
+```
 
 On the first run this will automatically create:
 `BookStatBackend/data/data.db`
