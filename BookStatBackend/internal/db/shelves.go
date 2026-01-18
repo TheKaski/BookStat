@@ -78,3 +78,60 @@ func CreateShelf(database *sql.DB, shelfData models.Shelf) (models.Shelf, error)
 
 
 }
+
+func UpdateShelfMetadataById(database *sql.DB, shelfData models.ShelfMetadata) (models.ShelfMetadata, error) {
+	
+	_, err := database.Exec(`
+		UPDATE shelves
+		SET name = ? 
+		WHERE id = ?
+		`,
+			shelfData.Name,
+			shelfData.Id,
+	)
+
+	if err != nil {
+		return models.ShelfMetadata{}, err
+	}
+
+	return shelfData, nil
+
+}
+
+func RemoveShelfById(database *sql.DB, shelfId uint) (models.ShelfMetadata, error) {
+
+	var shelf models.ShelfMetadata
+	err := database.QueryRow(`
+		SELECT id, name
+		FROM shelves
+		WHERE id = ?
+	`, shelfId).Scan(&shelf.Id, &shelf.Name)
+
+	if err != nil {
+		return models.ShelfMetadata{}, err
+	}
+
+	// unnassign all books that belong to this shelve:
+	_, err = database.Exec(`
+		UPDATE books
+		SET shelfId = NULL
+		WHERE shelfId = ?
+	`, shelfId)
+
+	if err != nil {
+		return models.ShelfMetadata{}, err
+	}
+
+	// then remove the shelve:
+	_, err = database.Exec(`
+		DELETE FROM shelves
+		WHERE id = ?
+	`, shelfId)
+
+	if err != nil {
+		return models.ShelfMetadata{}, err
+	}
+
+	return shelf, nil
+
+}

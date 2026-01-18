@@ -13,7 +13,7 @@ func InitSchema( db *sql.DB) error {
 		);`,
 		`CREATE TABLE IF NOT EXISTS books (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			shelfId INTEGER NOT NULL,
+			shelfId INTEGER NULL,
 			isbn TEXT NOT NULL,
 			title TEXT NOT NULL,
 			author TEXT,
@@ -23,7 +23,7 @@ func InitSchema( db *sql.DB) error {
 			coverType TEXT,
 			coverImageUrl TEXT,
 			weight INTEGER NUMBER,
-			FOREIGN KEY (shelfId) REFERENCES shelves(id)
+			FOREIGN KEY (shelfId) REFERENCES shelves(id) ON DELETE SET NULL
 		);`,
 	}
 	// Execute queries:

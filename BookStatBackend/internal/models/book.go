@@ -22,3 +22,5 @@ type BookMetadata struct {
 	Author 	 	  string `json:"author"`
 	CoverImageUrl string `json:"coverImageUrl"` 
 }
+
+

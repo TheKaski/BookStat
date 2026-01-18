@@ -45,22 +45,47 @@ func GetBooksMetadataByShelfId(database *sql.DB, shelfId uint ) ([]models.BookMe
 	return books, nil
 }
 
+func GetUnassignedBooksMetadata(database *sql.DB ) ([]models.BookMetadata, error) {
+	rows, err := database.Query(`
+		SELECT id, shelfId, title, author, coverImageUrl 
+		FROM books
+		WHERE shelfId = NULL`)
 
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var books []models.BookMetadata
+	for rows.Next() {
+		var b models.BookMetadata
+		rows.Scan(&b.Id, &b.ShelfId, &b.Title, &b.Author, &b.CoverImageUrl)
+		books = append(books, b)
+	}
+
+	return books, nil
+}
 
 func GetBookById(database *sql.DB, bookId uint) (models.Book, error) {
 
 	var b models.Book
 
 	err := database.QueryRow(`
-		SELECT id, shelfId, title, author, coverImageUrl 
+		SELECT id, shelfId, isbn, title, author, language, numberOfPages, format, coverType, coverImageUrl, weight 
 		FROM books
 		WHERE id = ?
 		`, bookId).Scan(
 			&b.Id,
 			&b.ShelfId,
+			&b.Isbn,
 			&b.Title,
 			&b.Author,
+			&b.Language,
+			&b.NumberOfPages,
+			&b.Format,
+			&b.CoverType,
 			&b.CoverImageUrl,
+			&b.Weight,
 		)
 
 	if err != nil {
@@ -104,4 +129,65 @@ func CreateBook(database *sql.DB, bookData models.Book) (models.Book, error) {
 
 }
 
+func UpdateBookById(database *sql.DB, bookData models.Book) (models.Book, error) {
+	_, err := database.Exec(`
+		UPDATE books
+		SET shelfId = ?, isbn = ?, title = ?, author = ?, language = ?, 
+			numberOfPages = ?, format = ?, coverType = ?, coverImageUrl = ?, weight = ?
+		WHERE id = ?
+		`,
+			bookData.ShelfId,
+			bookData.Isbn,
+			bookData.Title,
+			bookData.Author,
+			bookData.Language,
+			bookData.NumberOfPages,
+			bookData.Format,
+			bookData.CoverType,
+			bookData.CoverImageUrl,
+			bookData.Weight,
+			bookData.Id,
+	)
+
+	if err != nil {
+		return models.Book{}, err
+	}
+
+	return bookData, nil
+
+}
+
+func RemoveBookById(database *sql.DB, bookId uint) (models.BookMetadata, error) {
+
+	var b models.BookMetadata
+	err := database.QueryRow(`
+		SELECT id, shelfId, isbn, title, author, coverImageUrl
+		FROM books
+		WHERE id = ?
+		`, bookId).Scan(
+			&b.Id,
+			&b.ShelfId,
+			&b.Title,
+			&b.Author,
+			&b.CoverImageUrl,
+	)
+
+	if err != nil {
+		return models.BookMetadata{}, err
+	}
+
+	// then remove the book:
+	_, err = database.Exec(`
+		DELETE FROM books
+		WHERE id = ?
+	`, bookId)
+
+	if err != nil {
+		return models.BookMetadata{}, err
+	}
+
+	//Return the removed book data
+	return b, nil
+
+}
 

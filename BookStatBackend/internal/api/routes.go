@@ -12,10 +12,10 @@ func NewApiRouter(db *sql.DB) *chi.Mux {
 
 	// GET endpoints
 	r.Get("/shelves",GetShelvesHandler(db))
-
 	r.Get("/shelves/{id}",GetShelfByIdHandler(db))
 	r.Get("/books",GetBooksHandler(db))
 	r.Get("/books/{id}",GetBookByIdHandler(db))
+	r.Get("/books/unassigned", GetUnassignedBooksHandler(db))
 
 	//POST endpoints
 	r.Post("/shelves",CreateShelveHandler(db))
@@ -26,8 +26,8 @@ func NewApiRouter(db *sql.DB) *chi.Mux {
 	r.Put("/books/{id}",UpdateBookByIdHandler(db))
 
 	//DELETE endpoints
-	r.Put("/shelves/{id}",RemoveShelfByIdHandler(db))
-	r.Put("/books/{id}",RemoveBookByIdHandler(db))
+	r.Delete("/shelves/{id}",RemoveShelfByIdHandler(db))
+	r.Delete("/books/{id}",RemoveBookByIdHandler(db))
 
 	return r
 }
