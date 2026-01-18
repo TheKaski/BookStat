@@ -1,10 +1,15 @@
+import ShelvesPreviewContainer from "../components/ShelvesPreviewContainer";
+import UnassignedBooksContainer from "../components/UnassignedBooksContainer";
+
 export default function Home() {
   return (
     <>
-      <h1>This is the home page</h1>
       {/*Show a list of shelves with names*/}
+      <ShelvesPreviewContainer />
 
       {/*Show list of currently unassigned books if any*/}
+
+      <UnassignedBooksContainer />
     </>
   );
 }

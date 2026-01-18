@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { type BookMetadata, type ShelfMetadata } from "../types/domain.types";
 
 export const bookstatApi = createApi({
   reducerPath: "bookstatApi",
@@ -12,7 +13,7 @@ export const bookstatApi = createApi({
       query: (id) => `/books/${id}`,
     }),
 
-    getUnassignedBooks: builder.query({
+    getUnassignedBooks: builder.query<BookMetadata[], void>({
       query: () => "/books/unassigned",
     }),
 
@@ -39,7 +40,7 @@ export const bookstatApi = createApi({
       }),
     }),
 
-    getAllShelves: builder.query({
+    getAllShelves: builder.query<ShelfMetadata[], void>({
       query: () => "/shelves",
     }),
 
