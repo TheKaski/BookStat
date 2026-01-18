@@ -49,14 +49,14 @@ func GetUnassignedBooksMetadata(database *sql.DB ) ([]models.BookMetadata, error
 	rows, err := database.Query(`
 		SELECT id, shelfId, title, author, coverImageUrl 
 		FROM books
-		WHERE shelfId = NULL`)
+		WHERE shelfId IS NULL`)
 
 	if err != nil {
-		return nil, err
+		return []models.BookMetadata{}, err
 	}
 	defer rows.Close()
 
-	var books []models.BookMetadata
+	var books = []models.BookMetadata{}
 	for rows.Next() {
 		var b models.BookMetadata
 		rows.Scan(&b.Id, &b.ShelfId, &b.Title, &b.Author, &b.CoverImageUrl)
